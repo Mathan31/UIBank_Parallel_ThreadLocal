@@ -309,7 +309,7 @@ public boolean verifyDisplayedwithReturn(WebElement ele) {
 public void switchToWindow(int index) {
 	try {
 		Set<String> allWindowHandles = getDriver().getWindowHandles();
-		List<String> allHandles = new ArrayList<>();
+		List<String> allHandles = new ArrayList<>(); 
 		allHandles.addAll(allWindowHandles);
 		getDriver().switchTo().window(allHandles.get(index));
 	} catch (NoSuchWindowException e) {

@@ -13,11 +13,11 @@ public class TC001_LoginTestCase extends PreAndPost{
 		sDataExcelName="TC001";
 		authors = "Mathan";
 		category= "Smoke";
-		testcase= "Login";
+		testcase= "Login TestCase";
 		testdesc= "Login with Valid Credentials";
 		module =  "Login Valid";
 		} 
-
+ 
 	@Test(priority = 1,dataProvider = "ExcelData")
 	public void loginWithValidCredential(String uName,String pwd) {
 			

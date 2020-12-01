@@ -13,7 +13,7 @@ public class TC002_RegistrationTestCase extends PreAndPost{
 		sDataExcelName="TC002";
 		authors = "Mathan";
 		category= "Smoke";
-		testcase= "Registration";
+		testcase= "Registration TestCase";
 		testdesc= "Registration with Valid Mandatory Fields";
 		module =  "Registration";
 		}
