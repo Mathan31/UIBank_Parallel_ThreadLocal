@@ -20,7 +20,7 @@ public class TC002_RegistrationTestCase extends PreAndPost{
 	
 	@Test(priority = 1,dataProvider = "ExcelData")
 	public void registrationWithMandatoryFields(String fname,String sex,String uname,String email,String pw) {
-		new LoginPage(driver,node)
+		new LoginPage()
 			.clickRegisterLink()
 			.enterFirstName(fname)
 			.selectTitle()

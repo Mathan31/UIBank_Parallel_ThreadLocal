@@ -13,17 +13,8 @@ import libraries.SeleniumWrapper;
 
 public class AccountPage extends PreAndPost {
 	
-	private SeleniumWrapper oWrap;
-
-	public AccountPage(WebDriver driver , ExtentTest node) {
-		this.driver = driver;
-		this.node = node;
-		oWrap = new SeleniumWrapper(driver, node);
-	}
-	
-
-	public AccountPage validateAccountPage() {
-		boolean oElement = oWrap.verifyDisplayedwithReturn(driver.findElement(By.xpath("//h3[contains(text(),'Welcome')]")));
+		public AccountPage validateAccountPage() {
+		boolean oElement = verifyDisplayedwithReturn(getDriver().findElement(By.xpath("//h3[contains(text(),'Welcome')]")));
 		if(oElement) {
 			Assert.assertTrue(true);
 		}else {
@@ -33,8 +24,8 @@ public class AccountPage extends PreAndPost {
 	}
 	
 	public LoginPage clickLogout() {
-		oWrap.click(driver.findElement(By.xpath("//a[text()='Logout']")));
-		return new LoginPage(driver,node);
+		click(getDriver().findElement(By.xpath("//a[text()='Logout']")));
+		return new LoginPage();
 	}
 	
 }

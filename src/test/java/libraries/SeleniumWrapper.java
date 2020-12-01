@@ -1,10 +1,12 @@
 package libraries;
 
+import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidElementStateException;
@@ -13,6 +15,8 @@ import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -24,12 +28,14 @@ import com.aventstack.extentreports.ExtentTest;
 
 import base.PreAndPost;
 
-public class SeleniumWrapper extends PreAndPost{
+public class SeleniumWrapper extends HTMLReport{
 	
-	public SeleniumWrapper(WebDriver driver,ExtentTest node) {
-		this.driver = driver;
-		this.node = node;
+	public static ThreadLocal<WebDriver> tlDriver = new ThreadLocal<WebDriver>();
+	
+	public WebDriver getDriver() {
+		return tlDriver.get();
 	}
+	
 	
 	/*
 	 * public void clickElement(WebElement element) { try { element.click();
@@ -40,11 +46,11 @@ public class SeleniumWrapper extends PreAndPost{
 	public WebElement locateElement(String locator, String locValue) {
 	try {
 		switch (locator) {
-			case "id": return driver.findElement(By.id(locValue));
-			case "name": return driver.findElement(By.name(locValue));
-			case "class": return driver.findElement(By.className(locValue));
-			case "link" : return driver.findElement(By.linkText(locValue));
-			case "xpath": return driver.findElement(By.xpath(locValue));		
+			case "id": return getDriver().findElement(By.id(locValue));
+			case "name": return getDriver().findElement(By.name(locValue));
+			case "class": return getDriver().findElement(By.className(locValue));
+			case "link" : return getDriver().findElement(By.linkText(locValue));
+			case "xpath": return getDriver().findElement(By.xpath(locValue));		
 			default: break;
 		}
 
@@ -57,7 +63,7 @@ public class SeleniumWrapper extends PreAndPost{
 }
 
 public WebElement locateElement(String locValue) {
-	return driver.findElement(By.id(locValue));
+	return getDriver().findElement(By.id(locValue));
 }
 
 public void type(WebElement ele, String data) {
@@ -101,7 +107,7 @@ public void typeAndEnter(WebElement ele, String data) {
 public void click(WebElement ele) {
 	String text = "";
 	try {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+		WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(10));
 		wait.until(ExpectedConditions.elementToBeClickable(ele));			
 		text = ele.getText();
 		ele.click();
@@ -116,7 +122,7 @@ public void click(WebElement ele) {
 public void clickWithNoSnap(WebElement ele) {
 	String text = ""; 
 	try {
-		WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(10));
+		WebDriverWait wait = new WebDriverWait(getDriver(),Duration.ofSeconds(10));
 		wait.until(ExpectedConditions.elementToBeClickable(ele));	
 		text = ele.getText();
 		ele.click();			
@@ -142,7 +148,7 @@ public String getText(WebElement ele) {
 public String getTitle() {		
 	String bReturn = "";
 	try {
-		bReturn =  driver.getTitle();
+		bReturn =  getDriver().getTitle();
 	} catch (WebDriverException e) {
 		reportStep("Unknown Exception Occured While fetching Title", "FAIL");
 	} 
@@ -186,7 +192,7 @@ public boolean verifyExactTitle(String title) {
 			reportStep("The title of the page matches with the value :"+title,"PASS");
 			bReturn= true;
 		}else {
-			reportStep("The title of the page:"+driver.getTitle()+" did not match with the value :"+title, "FAIL");
+			reportStep("The title of the page:"+getDriver().getTitle()+" did not match with the value :"+title, "FAIL");
 		}
 	} catch (WebDriverException e) {
 		reportStep("Unknown exception occured while verifying the title", "FAIL");
@@ -201,7 +207,7 @@ public boolean verifyPartialTitle(String title) {
 			reportStep("The title of the page matches with the value :"+title,"PASS");
 			bReturn= true;
 		}else {
-			reportStep("The title of the page:"+driver.getTitle()+" did not match with the value :"+title, "FAIL");
+			reportStep("The title of the page:"+getDriver().getTitle()+" did not match with the value :"+title, "FAIL");
 		}
 	} catch (WebDriverException e) {
 		reportStep("Unknown exception occured while verifying the title", "FAIL");
@@ -302,12 +308,12 @@ public boolean verifyDisplayedwithReturn(WebElement ele) {
 
 public void switchToWindow(int index) {
 	try {
-		Set<String> allWindowHandles = driver.getWindowHandles();
+		Set<String> allWindowHandles = getDriver().getWindowHandles();
 		List<String> allHandles = new ArrayList<>();
 		allHandles.addAll(allWindowHandles);
-		driver.switchTo().window(allHandles.get(index));
+		getDriver().switchTo().window(allHandles.get(index));
 	} catch (NoSuchWindowException e) {
-		reportStep("The driver could not move to the given window by index "+index,"PASS");
+		reportStep("The getDriver() could not move to the given window by index "+index,"PASS");
 	} catch (WebDriverException e) {
 		reportStep("WebDriverException : "+e.getMessage(), "FAIL");
 	}
@@ -315,7 +321,7 @@ public void switchToWindow(int index) {
 
 public void switchToFrame(WebElement ele) {
 	try {
-		driver.switchTo().frame(ele);
+		getDriver().switchTo().frame(ele);
 		reportStep("switch In to the Frame "+ele,"PASS");
 	} catch (NoSuchFrameException e) {
 		reportStep("WebDriverException : "+e.getMessage(), "FAIL");
@@ -327,7 +333,7 @@ public void switchToFrame(WebElement ele) {
 public void acceptAlert() {
 	String text = "";		
 	try {
-		Alert alert = driver.switchTo().alert();
+		Alert alert = getDriver().switchTo().alert();
 		text = alert.getText();
 		alert.accept();
 		reportStep("The alert "+text+" is accepted.","PASS");
@@ -341,7 +347,7 @@ public void acceptAlert() {
 public void dismissAlert() {
 	String text = "";		
 	try {
-		Alert alert = driver.switchTo().alert();
+		Alert alert = getDriver().switchTo().alert();
 		text = alert.getText();
 		alert.dismiss();
 		reportStep("The alert "+text+" is dismissed.","PASS");
@@ -356,7 +362,7 @@ public void dismissAlert() {
 public String getAlertText() {
 	String text = "";		
 	try {
-		Alert alert = driver.switchTo().alert();
+		Alert alert = getDriver().switchTo().alert();
 		text = alert.getText();
 	} catch (NoAlertPresentException e) {
 		reportStep("There is no alert present.","FAIL");
@@ -369,7 +375,7 @@ public String getAlertText() {
 
 public void closeActiveBrowser() {
 	try {
-		driver.close();
+		getDriver().close();
 		reportStep("The browser is closed","PASS", false);
 	} catch (Exception e) {
 		reportStep("The browser could not be closed","FAIL", false);
@@ -378,7 +384,7 @@ public void closeActiveBrowser() {
 
 public void closeAllBrowsers() {
 	try {
-		driver.quit();
+		getDriver().quit();
 		reportStep("The opened browsers are closed","PASS", false);
 	} catch (Exception e) {
 		reportStep("Unexpected error occured in Browser","FAIL", false);
@@ -395,6 +401,18 @@ public void selectDropDownUsingValue(WebElement ele, String value) {
 	}
 
 }
-	
+public String takeScreenshot() {
+	String sPath = System.getProperty("user.dir")+"/snap/img"+System.currentTimeMillis()+".png";
+	TakesScreenshot oShot = (TakesScreenshot)getDriver();
+	File osrc = oShot.getScreenshotAs(OutputType.FILE);
+	File dis = new File(sPath);
+	try {
+		FileUtils.copyFile(osrc, dis);
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	return sPath;
+}
 
 }

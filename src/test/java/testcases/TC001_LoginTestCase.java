@@ -21,7 +21,7 @@ public class TC001_LoginTestCase extends PreAndPost{
 	@Test(priority = 1,dataProvider = "ExcelData")
 	public void loginWithValidCredential(String uName,String pwd) {
 			
-		new LoginPage(driver,node)
+		new LoginPage()
 		.enterUserName(uName)
 		.enterPassword(pwd)
 		.clickSignIn()

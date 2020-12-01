@@ -15,6 +15,12 @@ public abstract class HTMLReport {
 	public ExtentTest test, node;
 	public String authors,category;
 	
+	public static ThreadLocal<ExtentTest> tlNode = new ThreadLocal<ExtentTest>();
+	
+	public ExtentTest getNode() {
+		return tlNode.get();
+	}
+	
 	public void startReport() {
 		html = new ExtentHtmlReporter("./report/report.html");
 		extent = new ExtentReports();
@@ -34,17 +40,16 @@ public abstract class HTMLReport {
 	}
 
 	public ExtentTest startTestcase(String nodes) {
-		node = test.createNode(nodes);
-		//tlNode.set(testSuite.createNode(nodes));
-		return node;
+		tlNode.set(test.createNode(nodes));
+		return getNode();
 	}
 	
 	public void reportStep(String desc,String status) {
 		try {
 		if(status.equalsIgnoreCase("pass")){
-			node.pass(desc, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot()).build());
+			getNode().pass(desc, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot()).build());
 			} else {
-				node.fail(desc, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot()).build());	
+				getNode().fail(desc, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot()).build());	
 			}
 		}catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -64,14 +69,14 @@ public abstract class HTMLReport {
 		}		
 
 		if(status.equalsIgnoreCase("PASS")) {
-			node.pass(desc, img);		
+			getNode().pass(desc, img);		
 		}else if(status.equalsIgnoreCase("FAIL")) {
-			node.fail(desc, img);
+			getNode().fail(desc, img);
 			throw new RuntimeException();
 		}else if(status.equalsIgnoreCase("WARNING")) {
-			node.warning(desc, img);		
+			getNode().warning(desc, img);		
 		}else {
-			node.info(desc);
+			getNode().info(desc);
 		}
 	}
 	
