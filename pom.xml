@@ -51,7 +51,7 @@
 				<version>3.0.0-M5</version>
 				<configuration>
 					<suiteXmlFiles>
-						<suiteXmlFile>cucumber.xml</suiteXmlFile>
+						<suiteXmlFile>UIBank_Parallel.xml</suiteXmlFile>
 					</suiteXmlFiles>
 				</configuration>
 			</plugin>
